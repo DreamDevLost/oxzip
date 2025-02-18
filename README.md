@@ -47,6 +47,8 @@ oxzip extract -i archive.7z -o output_folder
 ```
 
 ## Roadmap
+- [x] Listing directory system directory and files
+- [ ] Support opening compressed files and listing
 - [ ] Add support for more compression formats
 - [ ] Implement drag-and-drop functionality
 - [ ] Provide pre-built binaries for Windows, macOS, and Linux
