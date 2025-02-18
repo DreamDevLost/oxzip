@@ -1,0 +1,221 @@
+import { Button, VerticalBox, ComboBox, StandardTableView, TextEdit, LineEdit, StandardButton, Palette, HorizontalBox } from "std-widgets.slint";
+
+@rust-attr(derive(serde::Serialize, serde::Deserialize))
+export struct FileObject {
+    name: string,
+    size: int,
+    modified_at: string,
+    created_at: string,
+    comment: string,
+    folders: int,
+    files: int,
+}
+
+export global AppContext {
+    in-out property <[FileObject]> files: [];
+    in-out property <int> last-selected-file: -1;
+    in-out property <string> current-path: "";
+}
+
+export component AppWindow inherits Window {
+    min-width: 300px;
+    preferred-width: 800px;
+    max-width: 9999999999px;
+
+    max-height: 9999999999px;
+
+    in-out property <int> counter: 42;
+    in-out property <[[StandardListViewItem]]> rows-data-property;
+    in-out property path-input-value <=> path-input.text;
+    in-out property selected-files-table-index <=> files-table.current-row;
+
+    // in-out property path-inputs <=> path-input;
+
+    callback request-increase-value();
+    callback add-button-clicked();
+    callback path-input-updated();
+    callback files-table-row-changed();
+    callback up-directory();
+
+    in property <string> error-message: "An error occurred";
+    callback show-error-dialog();
+    show-error-dialog => {
+        error-popup.show();
+    }
+
+    error-popup := PopupWindow {
+        x: 40px;
+        y: 100px;
+        width: min(confirm_popup_layout.preferred-width, root.width - 80px);
+
+        Rectangle {
+            background: Palette.background;
+            border-color: Palette.border;
+            border-width: 1px;
+        }
+
+        confirm_popup_layout := Dialog {
+            height: 100%;
+            width: 100%;
+
+            confirm_popup_text := Text {
+                text: error-message;
+                wrap: word-wrap;
+            }
+
+            StandardButton {
+                kind: ok;
+            }
+        }
+            // StandardButton { kind: no; }
+        }
+
+    VerticalBox {
+        GridLayout {
+            spacing: 5px;
+            Row {
+                Button {
+                    height: 60px;
+                    width: 60px;
+                    text: "Add";
+                    clicked => {
+                        root.add-button-clicked()
+                    }
+                }
+
+                Button {
+                    height: 60px;
+                    width: 60px;
+                    text: "Extract";
+                    clicked => {
+                        root.add-button-clicked()
+                    }
+                }
+
+                Button {
+                    height: 60px;
+                    width: 60px;
+                    text: "Test";
+                    clicked => {
+                        root.add-button-clicked()
+                    }
+                }
+
+                Button {
+                    height: 60px;
+                    width: 60px;
+                    text: "Copy";
+                    clicked => {
+                        root.add-button-clicked()
+                    }
+                }
+
+                Button {
+                    height: 60px;
+                    width: 60px;
+                    text: "Move";
+                    clicked => {
+                        root.add-button-clicked()
+                    }
+                }
+
+                Button {
+                    height: 60px;
+                    width: 60px;
+                    text: "Delete";
+                    clicked => {
+                        root.add-button-clicked()
+                    }
+                }
+
+                Button {
+                    height: 60px;
+                    width: 60px;
+                    text: "Info";
+                    clicked => {
+                        root.add-button-clicked()
+                    }
+                }
+            }
+        }
+
+        /* Text {
+            text: "Counter: \{root.counter}";
+        }
+
+        Button {
+            text: "Increase value";
+            clicked => {
+                root.request-increase-value();
+            }
+        }
+
+        list := ComboBox {
+            current-value: "Test";
+        } */
+        HorizontalBox {
+            padding: 0;
+
+            Button {
+                text: "Up";
+                clicked => {
+                    root.up-directory();
+                }
+            }
+
+            path-input := LineEdit {
+                placeholder-text: "Path...";
+                accepted(text) => {
+                    root.path-input-updated();
+                }
+                edited(text) => {
+                    root.path-input-value = text;
+                }
+                key-released(event) => {
+                    if (event.text == Key.Return) {
+                        root.path-input-updated();
+                    }
+                    reject
+                }
+            }
+        }
+
+        files-table := StandardTableView {
+            // width: ;
+            min-height: 200px;
+            columns: [
+                { title: "Name" },
+                { title: "Size" },
+                { title: "Modified at" },
+                { title: "Created at" },
+                { title: "Comment" },
+                { title: "Folders" },
+                { title: "Files" },
+            ];
+            rows: rows-data-property;
+            current-row-changed(current-row) => {
+                root.files-table-row-changed();
+            }
+        }
+    }
+}
+
+export component ErrorDialog inherits Dialog {
+    title: "Error";
+
+    in-out property <string> message: "An error occurred";
+
+    // VerticalBox {
+    Text {
+        text: message;
+    }
+
+    StandardButton {
+        kind: ok;
+    }
+
+    StandardButton {
+        kind: cancel;
+    }
+    // }
+}
